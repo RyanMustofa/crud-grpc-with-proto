@@ -7,6 +7,23 @@ option go_package = "/protobuf";
 
 service BankService {
   rpc GetBanks(Params) returns (Banks);
+  rpc PostBanks(Body) returns (Status);
+  rpc UpdateBanks(Id) returns (Status);
+  rpc DeleteBanks(Id) returns (Status);
+}
+
+message Id {
+  int32 id = 1;
+  string name = 2;
+}
+
+message Body {
+  string name = 1;
+}
+
+message Status {
+  bool status = 1;
+  string message = 2;
 }
 
 message Params {

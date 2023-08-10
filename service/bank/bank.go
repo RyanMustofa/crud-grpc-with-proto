@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"grpc-learn/protobuf"
 	"log"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,6 +21,19 @@ type BankService struct {
 type DateValue struct {
 	UpdatedAt sql.NullTime `json:"updated_at,omitempty"`
 	CreatedAt sql.NullTime `json:"created_at,omitempty"`
+}
+
+type Body struct {
+	Name string `json:"name"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+}
+
+type BankStruct struct {
+	Id int `json:"id"`
+	Name string `json:"name,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
 func (b *BankService) GetBanks(ctx context.Context, params *protobuf.Params) (*protobuf.Banks, error){
@@ -71,5 +85,90 @@ func (b *BankService) GetBanks(ctx context.Context, params *protobuf.Params) (*p
 		},
 		Data: banks,
 	}
+	return response, nil
+}
+
+func (b *BankService) PostBanks(ctx context.Context, body *protobuf.Body) (*protobuf.Status, error) {
+	var name string
+	if body.GetName() != "" {
+		name = body.GetName()
+	}
+	payload := Body{
+		Name: name,
+		CreatedAt: time.Now(),
+	}
+
+	err := b.DB.Table("banks").Create(&payload)
+	if err.Error != nil {
+		return &protobuf.Status{
+			Status: false,
+			Message: "Failed " + err.Error.Error(),
+		}, status.Error(codes.Internal, "Failed internal " + err.Error.Error())
+	}
+	response := &protobuf.Status{
+		Status: true,
+		Message: "Success Add",
+	}
+
+	return response, nil
+}
+
+func (b *BankService) UpdateBanks(ctx context.Context, id *protobuf.Id) (*protobuf.Status, error){
+	var id_data int32 
+	var name string
+	if id.GetId() != 0 {
+		id_data = id.GetId()
+	}
+	if id.GetName() != ""{
+		name = id.GetName()
+	}
+
+	var dataSelect BankStruct
+	results := b.DB.Table("banks").Where(map[string]interface{}{"id": id_data}).First(&dataSelect);
+	if  results.Error != nil {
+		return &protobuf.Status{
+			Status: false,
+			Message: "Failed :: " + results.Error.Error(),
+		}, nil
+	}
+
+	dataSelect.Name = name
+
+	if errorS := results.Save(&dataSelect); errorS.Error != nil {
+		return &protobuf.Status{
+			Status: false,
+			Message: "Failed :: " + errorS.Error.Error(),
+		}, nil
+	}
+	
+
+	response := &protobuf.Status{
+		Status: true,
+		Message: "Proto Update",
+	}
+
+	return response, nil
+}
+
+func (b *BankService) DeleteBanks(ctx context.Context, params *protobuf.Id) (*protobuf.Status, error){
+	var bank BankStruct
+	
+	var id int32
+	if params.GetId() != 0 {
+		id = params.GetId()
+	}
+
+	results := b.DB.Table("banks").Where(map[string]interface{}{"id": id}).Delete(&bank)
+	if results.Error != nil {
+		return &protobuf.Status{
+			Status: false,
+			Message: "Failed :: " + results.Error.Error(),
+		}, nil
+	}
+	response := &protobuf.Status{
+		Status: true,
+		Message: "Delete Success",
+	}
+
 	return response, nil
 }

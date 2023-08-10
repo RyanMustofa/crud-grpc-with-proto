@@ -19,7 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BankService_GetBanks_FullMethodName = "/bank_proto.BankService/GetBanks"
+	BankService_GetBanks_FullMethodName    = "/bank_proto.BankService/GetBanks"
+	BankService_PostBanks_FullMethodName   = "/bank_proto.BankService/PostBanks"
+	BankService_UpdateBanks_FullMethodName = "/bank_proto.BankService/UpdateBanks"
+	BankService_DeleteBanks_FullMethodName = "/bank_proto.BankService/DeleteBanks"
 )
 
 // BankServiceClient is the client API for BankService service.
@@ -27,6 +30,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BankServiceClient interface {
 	GetBanks(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Banks, error)
+	PostBanks(ctx context.Context, in *Body, opts ...grpc.CallOption) (*Status, error)
+	UpdateBanks(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error)
+	DeleteBanks(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error)
 }
 
 type bankServiceClient struct {
@@ -46,11 +52,41 @@ func (c *bankServiceClient) GetBanks(ctx context.Context, in *Params, opts ...gr
 	return out, nil
 }
 
+func (c *bankServiceClient) PostBanks(ctx context.Context, in *Body, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, BankService_PostBanks_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) UpdateBanks(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, BankService_UpdateBanks_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) DeleteBanks(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, BankService_DeleteBanks_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BankServiceServer is the server API for BankService service.
 // All implementations must embed UnimplementedBankServiceServer
 // for forward compatibility
 type BankServiceServer interface {
 	GetBanks(context.Context, *Params) (*Banks, error)
+	PostBanks(context.Context, *Body) (*Status, error)
+	UpdateBanks(context.Context, *Id) (*Status, error)
+	DeleteBanks(context.Context, *Id) (*Status, error)
 	mustEmbedUnimplementedBankServiceServer()
 }
 
@@ -60,6 +96,15 @@ type UnimplementedBankServiceServer struct {
 
 func (UnimplementedBankServiceServer) GetBanks(context.Context, *Params) (*Banks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBanks not implemented")
+}
+func (UnimplementedBankServiceServer) PostBanks(context.Context, *Body) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostBanks not implemented")
+}
+func (UnimplementedBankServiceServer) UpdateBanks(context.Context, *Id) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateBanks not implemented")
+}
+func (UnimplementedBankServiceServer) DeleteBanks(context.Context, *Id) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteBanks not implemented")
 }
 func (UnimplementedBankServiceServer) mustEmbedUnimplementedBankServiceServer() {}
 
@@ -92,6 +137,60 @@ func _BankService_GetBanks_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BankService_PostBanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Body)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).PostBanks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_PostBanks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).PostBanks(ctx, req.(*Body))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_UpdateBanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).UpdateBanks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_UpdateBanks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).UpdateBanks(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_DeleteBanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).DeleteBanks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_DeleteBanks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).DeleteBanks(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BankService_ServiceDesc is the grpc.ServiceDesc for BankService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +201,18 @@ var BankService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBanks",
 			Handler:    _BankService_GetBanks_Handler,
+		},
+		{
+			MethodName: "PostBanks",
+			Handler:    _BankService_PostBanks_Handler,
+		},
+		{
+			MethodName: "UpdateBanks",
+			Handler:    _BankService_UpdateBanks_Handler,
+		},
+		{
+			MethodName: "DeleteBanks",
+			Handler:    _BankService_DeleteBanks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
