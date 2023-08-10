@@ -1,0 +1,32 @@
+syntax = "proto3";
+package bank_proto;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "/protobuf";
+
+service BankService {
+  rpc GetBanks(Params) returns (Banks);
+}
+
+message Params {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message Pagination {
+  uint64 page = 1;
+  uint64 limit = 2;
+}
+
+message Banks {
+  Pagination meta = 1;
+  repeated Bank data = 2;
+}
+
+message Bank {
+  uint64 id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
